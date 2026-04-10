@@ -13,6 +13,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.1",
     "next": "^16.0.0",
+    "next-nprogress-bar": "^2.4.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "zustand": "^5.0.8"

@@ -1,6 +1,8 @@
 import "./globals.css";
 import { ShopProvider } from "@/context/ShopContext";
 import Footer from "@/components/layout/Footer";
+import { Suspense } from "react";
+import ProgressBarProvider from "@/components/layout/ProgressbarProvider";
 
 export const metadata = {
   title: "dreamtrends",
@@ -11,10 +13,14 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <ShopProvider>
-          {children}
-          <Footer />
-        </ShopProvider>
+        <Suspense>
+          <ProgressBarProvider>
+            <ShopProvider>
+              {children}
+              <Footer />
+            </ShopProvider>
+          </ProgressBarProvider>
+        </Suspense>
       </body>
     </html>
   );
