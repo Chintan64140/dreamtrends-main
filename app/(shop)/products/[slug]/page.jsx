@@ -4,11 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import { useShop } from "@/context/ShopContext";
 import { useParams } from "next/navigation";
-
-const toAbsoluteMediaUrl = (value) => {
-  if (!value) return "";
-  return value.startsWith("http") ? value : `http://localhost:5000${value}`;
-};
+import { getBackendBaseUrl } from "@/lib/env";
+import { toAbsoluteMediaUrl } from "@/lib/shopState";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -64,7 +61,7 @@ export default function ProductDetailPage() {
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const res = await fetch(`http://localhost:5000/api/products/${slug}`);
+        const res = await fetch(`${getBackendBaseUrl()}/api/products/${slug}`);
         if (res.ok) {
           const data = await res.json();
           setProduct(data);

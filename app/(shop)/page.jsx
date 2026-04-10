@@ -2,10 +2,11 @@ import Navbar from "@/components/layout/Navbar";
 import HeroBanner from "@/components/home/HeroBanner";
 import CategoryBoard from "@/components/home/CategoryBoard";
 import ProductGrid from "@/components/product/ProductGrid";
+import { getBackendBaseUrl } from "@/lib/env";
 
 async function fetchProducts() {
   try {
-    const res = await fetch('http://localhost:5000/api/products', { cache: 'no-store' });
+    const res = await fetch(`${getBackendBaseUrl()}/api/products`, { cache: 'no-store' });
     if (!res.ok) return [];
     return await res.json();
   } catch (error) {
@@ -16,7 +17,7 @@ async function fetchProducts() {
 
 async function fetchCategories() {
   try {
-    const res = await fetch("http://localhost:5000/api/categories", { cache: "no-store" });
+    const res = await fetch(`${getBackendBaseUrl()}/api/categories`, { cache: "no-store" });
     if (!res.ok) return [];
     return await res.json();
   } catch (error) {

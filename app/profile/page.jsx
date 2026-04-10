@@ -3,11 +3,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import { useShop } from "@/context/ShopContext";
-
-function getOrderImage(image) {
-  if (!image) return "";
-  return image.startsWith("http") ? image : `http://localhost:5000${image}`;
-}
+import { toAbsoluteMediaUrl } from "@/lib/shopState";
 
 export default function ProfilePage() {
   const { user } = useShop();
@@ -79,7 +75,7 @@ export default function ProfilePage() {
                       <div key={`${order._id}-${item.product || item.name}-${index}`} className="profile-order-item">
                         {item?.image ? (
                           <img
-                            src={getOrderImage(item.image)}
+                            src={toAbsoluteMediaUrl(item.image)}
                             alt={item.name}
                             className="profile-order-image"
                           />

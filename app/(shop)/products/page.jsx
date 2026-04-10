@@ -1,6 +1,7 @@
 import Navbar from "@/components/layout/Navbar";
 import FilterSidebar from "@/components/product/FilterSidebar";
 import ProductGrid from "@/components/product/ProductGrid";
+import { getBackendBaseUrl } from "@/lib/env";
 
 async function fetchProducts(searchParams = {}) {
   const params = new URLSearchParams();
@@ -24,7 +25,7 @@ async function fetchProducts(searchParams = {}) {
   try {
     const query = params.toString();
     const res = await fetch(
-      `http://localhost:5000/api/products${query ? `?${query}` : ""}`,
+      `${getBackendBaseUrl()}/api/products${query ? `?${query}` : ""}`,
       { cache: "no-store" }
     );
     if (!res.ok) return [];
@@ -37,7 +38,7 @@ async function fetchProducts(searchParams = {}) {
 
 async function fetchCategories() {
   try {
-    const res = await fetch("http://localhost:5000/api/categories", { cache: "no-store" });
+    const res = await fetch(`${getBackendBaseUrl()}/api/categories`, { cache: "no-store" });
     if (!res.ok) return [];
     return await res.json();
   } catch (error) {

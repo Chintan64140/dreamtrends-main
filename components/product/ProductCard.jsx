@@ -2,16 +2,13 @@
 
 import Link from "next/link";
 import { useShop } from "@/context/ShopContext";
+import { toAbsoluteMediaUrl } from "@/lib/shopState";
 
 export default function ProductCard({ product }) {
   const { addToCart, toggleWishlist, wishlist } = useShop();
   const isWishlisted = wishlist.some((item) => item._id === product._id);
   const imageSource = product.thumbnail || product.images?.[0]?.url || product.image;
-  const imageUrl = imageSource
-    ? imageSource.startsWith("http")
-      ? imageSource
-      : `http://localhost:5000${imageSource}`
-    : "";
+  const imageUrl = toAbsoluteMediaUrl(imageSource);
 
   return (
     <article className="product-card">
