@@ -7,6 +7,14 @@ import User from "@/models/User";
 
 export const runtime = "nodejs";
 
+function normalizeAccessoriesOption(value) {
+  return value === "with" ? "with" : "without";
+}
+
+function normalizeSelectedSize(value) {
+  return String(value || "FREESIZE").trim() || "FREESIZE";
+}
+
 async function getCartResponse(userId) {
   const user = await User.findById(userId)
     .populate({
@@ -20,7 +28,10 @@ async function getCartResponse(userId) {
       ?.filter((item) => item.product)
       .map((item) => ({
         ...serializeProduct(item.product),
+        cartItemId: item._id?.toString?.() || item._id,
         quantity: item.quantity,
+        accessoriesOption: normalizeAccessoriesOption(item.accessoriesOption),
+        selectedSize: normalizeSelectedSize(item.selectedSize),
       })) || [];
 
   return cart;
@@ -44,7 +55,7 @@ export async function POST(request) {
     const authUser = await getAuthUser(request);
     if (!authUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { productId, quantity = 1 } = await request.json();
+    const { productId, quantity = 1, accessoriesOption, selectedSize } = await request.json();
     if (!productId) {
       return NextResponse.json({ error: "Product ID is required." }, { status: 400 });
     }
@@ -56,12 +67,24 @@ export async function POST(request) {
     }
 
     const user = await User.findById(authUser.id);
-    const existingItem = user.cart.find((item) => item.product.toString() === productId);
+    const normalizedAccessoriesOption = normalizeAccessoriesOption(accessoriesOption);
+    const normalizedSelectedSize = normalizeSelectedSize(selectedSize);
+    const existingItem = user.cart.find(
+      (item) =>
+        item.product.toString() === productId &&
+        normalizeAccessoriesOption(item.accessoriesOption) === normalizedAccessoriesOption &&
+        normalizeSelectedSize(item.selectedSize) === normalizedSelectedSize
+    );
 
     if (existingItem) {
       existingItem.quantity += Math.max(1, Number(quantity || 1));
     } else {
-      user.cart.push({ product: productId, quantity: Math.max(1, Number(quantity || 1)) });
+      user.cart.push({
+        product: productId,
+        quantity: Math.max(1, Number(quantity || 1)),
+        accessoriesOption: normalizedAccessoriesOption,
+        selectedSize: normalizedSelectedSize,
+      });
     }
 
     await user.save();
@@ -77,14 +100,14 @@ export async function PUT(request) {
     const authUser = await getAuthUser(request);
     if (!authUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { productId, quantity } = await request.json();
-    if (!productId) {
-      return NextResponse.json({ error: "Product ID is required." }, { status: 400 });
+    const { cartItemId, quantity } = await request.json();
+    if (!cartItemId) {
+      return NextResponse.json({ error: "Cart item ID is required." }, { status: 400 });
     }
 
     await connectDB();
     const user = await User.findById(authUser.id);
-    const existingItem = user.cart.find((item) => item.product.toString() === productId);
+    const existingItem = user.cart.id(cartItemId);
 
     if (!existingItem) {
       return NextResponse.json({ error: "Cart item not found." }, { status: 404 });
@@ -92,7 +115,7 @@ export async function PUT(request) {
 
     const nextQty = Number(quantity || 0);
     if (nextQty <= 0) {
-      user.cart = user.cart.filter((item) => item.product.toString() !== productId);
+      existingItem.deleteOne();
     } else {
       existingItem.quantity = nextQty;
     }
@@ -110,13 +133,14 @@ export async function DELETE(request) {
     const authUser = await getAuthUser(request);
     if (!authUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const productId = new URL(request.url).searchParams.get("productId");
+    const cartItemId = new URL(request.url).searchParams.get("cartItemId");
 
     await connectDB();
     const user = await User.findById(authUser.id);
 
-    if (productId) {
-      user.cart = user.cart.filter((item) => item.product.toString() !== productId);
+    if (cartItemId) {
+      const existingItem = user.cart.id(cartItemId);
+      if (existingItem) existingItem.deleteOne();
     } else {
       user.cart = [];
     }

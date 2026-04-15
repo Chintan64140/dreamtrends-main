@@ -58,6 +58,12 @@ function MenuIcon() {
 export default function Navbar() {
   const { user, cartCount, wishlistCount, logout } = useShop();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const primaryLinks = [
+    { label: "Home", href: "/" },
+    { label: "Watch Collection", href: "/products" },
+    { label: "New Arrivals", href: "/products?sort=newest" },
+    { label: "Track Order", href: "/profile" }
+  ];
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
@@ -70,37 +76,58 @@ export default function Navbar() {
 
   return (
     <header className="navbar-shell">
-      <header className="navbar">
+      <div className="promo-bar">
+        <span>Extra 20% off on prepaid orders</span>
+        <span>Limited time deal - hurry up</span>
+      </div>
+
+      <header className="navbar navbar-top">
+        <nav className="top-nav-links">
+          {primaryLinks.map((link) => (
+            <Link key={link.label} href={link.href} onClick={closeMobileMenu}>
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="top-nav-auth">
+          <Link href={user ? "/profile" : "/login"}>{user ? "My Account" : "Log in"}</Link>
+        </div>
+      </header>
+
+      <header className="navbar navbar-main">
         <Link href="/" className="brand" onClick={closeMobileMenu}>
           <span className="brand-mark">DT</span>
           <span className="brand-text">DREAMTRENDS</span>
         </Link>
 
+        <div className="nav-search-chip">
+          <SearchIcon />
+          <span>Search the collection</span>
+        </div>
+
         <div className="nav-actions nav-actions-desktop">
-          <Link href="/products" className="admin-link">
-            Shop
-          </Link>
-          <Link href="/wishlist" className="admin-link">
+          <Link href="/wishlist" className="nav-link-pill">
             Wishlist {wishlistCount > 0 ? `(${wishlistCount})` : ""}
           </Link>
           <Link href="/cart" className="icon-btn" aria-label="Cart">
             <CartIcon />
             {cartCount > 0 ? <small className="count-badge">{cartCount}</small> : null}
           </Link>
-          <Link href={user ? "/profile" : "/login"} className="admin-link">
+          <Link href={user ? "/profile" : "/login"} className="nav-link-pill">
             {user ? "Account" : "Login"}
           </Link>
           {user?.role === "admin" ? (
-            <Link href="/admin" className="admin-link">
+            <Link href="/admin" className="nav-link-pill">
               Admin
             </Link>
           ) : null}
           {user ? (
-            <button className="admin-link" onClick={handleLogout}>
+            <button className="nav-link-pill" onClick={handleLogout}>
               Logout
             </button>
           ) : (
-            <Link href="/register" className="admin-link">
+            <Link href="/register" className="nav-link-pill nav-link-pill-dark">
               Sign Up
             </Link>
           )}
@@ -128,12 +155,16 @@ export default function Navbar() {
 
       {mobileMenuOpen ? (
         <div className="mobile-nav-panel">
-          <Link href="/" className="mobile-nav-link mobile-nav-link-active" onClick={closeMobileMenu}>
-            Home
-          </Link>
-          <Link href="/profile" className="mobile-nav-link" onClick={closeMobileMenu}>
-            My Order
-          </Link>
+          {primaryLinks.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              className={`mobile-nav-link ${link.href === "/" ? "mobile-nav-link-active" : ""}`}
+              onClick={closeMobileMenu}
+            >
+              {link.label}
+            </Link>
+          ))}
           <Link
             href={user ? "/profile" : "/login"}
             className="mobile-nav-icon-link"

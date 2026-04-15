@@ -2,30 +2,30 @@ import Link from "next/link";
 
 const footerGroups = [
   {
-    title: "Shop",
+    title: "Quick links",
     links: [
-      { label: "All Products", href: "/products" },
+      { label: "Home", href: "/" },
+      { label: "Watch Collection", href: "/products" },
       { label: "New Arrivals", href: "/products?sort=newest" },
-      { label: "Best Sellers", href: "/products?sort=popular" },
-      { label: "Gift Picks", href: "/products?tag=gifts" }
+      { label: "Track Order", href: "/profile" }
+    ]
+  },
+  {
+    title: "Policy",
+    links: [
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms of Service", href: "/terms-of-service" },
+      { label: "Shipping Info", href: "/shipping-info" },
+      { label: "Secure Checkout", href: "/secure-checkout" }
     ]
   },
   {
     title: "Support",
     links: [
+      { label: "Contact Us", href: "/contact-us" },
       { label: "My Account", href: "/profile" },
-      { label: "My Orders", href: "/profile" },
       { label: "Wishlist", href: "/wishlist" },
       { label: "Cart", href: "/cart" }
-    ]
-  },
-  {
-    title: "About",
-    links: [
-      { label: "Our Story", href: "/our-story" },
-      { label: "Shipping Info", href: "/shipping-info" },
-      { label: "Secure Checkout", href: "/secure-checkout" },
-      { label: "Contact Us", href: "/contact-us" }
     ]
   }
 ];
@@ -40,13 +40,13 @@ export default function Footer() {
               DREAMTRENDS
             </Link>
             <p>
-              A trend-led shopping destination for fashion, lifestyle, gifting, and everyday finds.
-              Built for customers who want sharp discovery, trusted checkout, and smooth delivery.
+              A fast, high-polish storefront for fashion-led watch discovery, built to feel premium without changing the way your current store works.
             </p>
             <div className="footer-trust-row">
-              <span>Secure payments</span>
-              {/* <span>Easy returns</span> */}
+              <span>Free shipping</span>
+              <span>Easy returns</span>
               <span>Pan-India delivery</span>
+              <span>COD available</span>
             </div>
           </div>
 
@@ -70,8 +70,7 @@ export default function Footer() {
         <section className="footer-bottom">
           <p>(c) 2026 dreamtrends. All rights reserved.</p>
           <div>
-            <Link href="/privacy-policy">Privacy Policy</Link>
-            <Link href="/terms-of-service">Terms of Service</Link>
+            <span>Email: support@dreamtrends.store</span>
             <Link href="/contact-us">Support Hours: 10 AM - 7 PM</Link>
           </div>
         </section>

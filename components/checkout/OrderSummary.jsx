@@ -19,11 +19,15 @@ export default function OrderSummary({
 
       <div className="summary-items">
         {cart.map((item) => (
-          <div key={item._id} className="summary-item">
+          <div key={item.cartItemId || item._id} className="summary-item">
             <div>
               <p>{item.name}</p>
               <small>
                 Qty {item.quantity} x Rs. {item.price}
+              </small>
+              <small>Size: {(item.selectedSize || "FREESIZE").toUpperCase()}</small>
+              <small>
+                {item.accessoriesOption === "with" ? "With ACCESSORIES" : "Without ACCESSORIES"}
               </small>
             </div>
             <strong>Rs. {item.quantity * item.price}</strong>

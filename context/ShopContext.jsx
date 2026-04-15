@@ -66,13 +66,13 @@ export function ShopProvider({ children }) {
     loadShopState();
   }, [user?.id]);
 
-  const addToCart = async (product) => {
+  const addToCart = async (product, accessoriesOption = "without", selectedSize = "FREESIZE") => {
     if (!user?.id) return redirectToLogin();
 
     const response = await fetch("/api/cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productId: product._id, quantity: 1 }),
+      body: JSON.stringify({ productId: product._id, quantity: 1, accessoriesOption, selectedSize }),
     });
 
     const data = await response.json();
@@ -99,10 +99,10 @@ export function ShopProvider({ children }) {
     return true;
   };
 
-  const removeFromCart = async (productId) => {
+  const removeFromCart = async (cartItemId) => {
     if (!user?.id) return false;
 
-    const response = await fetch(`/api/cart?productId=${productId}`, { method: "DELETE" });
+    const response = await fetch(`/api/cart?cartItemId=${cartItemId}`, { method: "DELETE" });
     const data = await response.json();
     if (!response.ok) return false;
 
@@ -124,13 +124,13 @@ export function ShopProvider({ children }) {
     return true;
   };
 
-  const updateCartQty = async (productId, quantity) => {
+  const updateCartQty = async (cartItemId, quantity) => {
     if (!user?.id) return false;
 
     const response = await fetch("/api/cart", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productId, quantity }),
+      body: JSON.stringify({ cartItemId, quantity }),
     });
 
     const data = await response.json();

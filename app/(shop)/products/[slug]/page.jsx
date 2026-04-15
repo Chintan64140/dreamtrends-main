@@ -7,6 +7,29 @@ import { useParams } from "next/navigation";
 import { getBackendBaseUrl } from "@/lib/env";
 import { toAbsoluteMediaUrl } from "@/lib/shopState";
 
+function buildProductHighlights(product) {
+  const specs = product?.specs || {};
+
+  return [
+    specs.dialSize ? `${specs.dialSize} dial profile` : null,
+    specs.movement ? `${specs.movement} movement` : null,
+    specs.waterResist ? `${specs.waterResist} water resistance` : null,
+    specs.strap ? `${specs.strap} strap finish` : null
+  ].filter(Boolean);
+}
+
+function getSizeOptionMeta(size) {
+  if (String(size || "").trim().toUpperCase() === "FREESIZE") {
+    return "Standard fit";
+  }
+
+  return "Available";
+}
+
+function getAccessoriesOptionMeta(option) {
+  return option === "with" ? "Included" : "Not included";
+}
+
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const { addToCart, toggleWishlist, wishlist } = useShop();
@@ -14,6 +37,9 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [accessoriesOption, setAccessoriesOption] = useState("without");
+  const [selectedSize, setSelectedSize] = useState("FREESIZE");
 
   const isWishlisted = wishlist.some((item) => item._id === product?._id);
   const mediaItems = useMemo(() => {
@@ -57,6 +83,15 @@ export default function ProductDetailPage() {
   }, [product]);
 
   const activeMedia = mediaItems[activeMediaIndex] || mediaItems[0] || null;
+  const sizeOptions = useMemo(() => {
+    const configuredSizes = Array.isArray(product?.sizes)
+      ? product.sizes
+          .map((size) => String(size || "").trim())
+          .filter(Boolean)
+      : [];
+
+    return configuredSizes.length ? configuredSizes : ["FREESIZE"];
+  }, [product]);
 
   useEffect(() => {
     async function fetchProduct() {
@@ -65,7 +100,10 @@ export default function ProductDetailPage() {
         if (res.ok) {
           const data = await res.json();
           setProduct(data);
+          setAccessoriesOption("without");
+          setSelectedSize("FREESIZE");
           setActiveMediaIndex(0);
+          setIsPreviewOpen(false);
         }
       } catch (err) {
         console.error("Failed to fetch product:", err);
@@ -86,6 +124,16 @@ export default function ProductDetailPage() {
       setActiveMediaIndex(0);
     }
   }, [activeMediaIndex, mediaItems]);
+
+  useEffect(() => {
+    setIsPreviewOpen(false);
+  }, [activeMediaIndex]);
+
+  useEffect(() => {
+    if (!sizeOptions.includes(selectedSize)) {
+      setSelectedSize(sizeOptions[0] || "FREESIZE");
+    }
+  }, [selectedSize, sizeOptions]);
 
   if (loading) {
     return (
@@ -119,6 +167,9 @@ export default function ProductDetailPage() {
     setActiveMediaIndex((current) => (current === mediaItems.length - 1 ? 0 : current + 1));
   };
 
+  const productHighlights = buildProductHighlights(product);
+  const specEntries = Object.entries(product.specs || {}).filter(([, value]) => Boolean(value));
+
   return (
     <>
       <Navbar />
@@ -135,11 +186,18 @@ export default function ProductDetailPage() {
                       className="product-detail-video"
                     />
                   ) : (
-                    <img
-                      src={activeMedia.src}
-                      alt={activeMedia.alt}
-                      className="product-detail-image"
-                    />
+                    <button
+                      type="button"
+                      className="product-detail-image-button"
+                      onClick={() => setIsPreviewOpen(true)}
+                      aria-label="Open product image preview"
+                    >
+                      <img
+                        src={activeMedia.src}
+                        alt={activeMedia.alt}
+                        className="product-detail-image"
+                      />
+                    </button>
                   )}
                 </div>
               ) : (
@@ -197,22 +255,149 @@ export default function ProductDetailPage() {
               </div>
           ) : null}
         </div>
-        <div>
-          <p className="product-brand">{product.brand || "dreamtrends"}</p>
-          <h1>{product.name}</h1>
-          <p className="product-price">
-            Rs. {product.price} {product.comparePrice > product.price && <span>Rs. {product.comparePrice}</span>}
-          </p>
-          <p>{product.description}</p>
+        <div className="product-detail-copy">
+          <div className="product-detail-header">
+            <p className="product-brand">{product.brand || "dreamtrends"}</p>
+            <h1 className="product-detail-title">{product.name}</h1>
+            <p className="product-price product-detail-price">
+              Rs. {product.price} {product.comparePrice > product.price && <span>Rs. {product.comparePrice}</span>}
+            </p>
+            <p className="product-detail-intro">
+              Crafted for everyday wear with a sharper, more premium presentation across dial finish, strap texture, and wrist presence.
+            </p>
+          </div>
 
-          <div className="product-actions detail-actions" style={{ marginTop: '30px' }}>
-            <button onClick={() => addToCart(product)}>Add to Cart</button>
+          {productHighlights.length ? (
+            <div className="product-highlight-row">
+              {productHighlights.map((item) => (
+                <span key={item} className="product-highlight-chip">
+                  {item}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          <section className="product-detail-card">
+            <p className="product-detail-eyebrow">Product Description</p>
+            <p className="product-detail-description">
+              {product.description}
+            </p>
+            <p className="product-detail-supporting-copy">
+              Designed to feel refined from the first look, this piece balances statement styling with comfortable everyday usability.
+            </p>
+          </section>
+
+          {specEntries.length ? (
+            <section className="product-detail-card product-spec-card">
+              <div className="product-spec-header">
+                <p className="product-detail-eyebrow">Key Details</p>
+                <span>Built for daily rotation</span>
+              </div>
+              <div className="product-spec-grid">
+                {specEntries.map(([key, value]) => (
+                  <div key={key} className="product-spec-item">
+                    <span>
+                      {key
+                        .replace(/([A-Z])/g, " $1")
+                        .replace(/^./, (char) => char.toUpperCase())}
+                    </span>
+                    <strong>{value}</strong>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          <section className="product-detail-card">
+            <div className="product-spec-header">
+              <p className="product-detail-eyebrow">Size</p>
+              <span>{sizeOptions.length > 1 ? "Select the size you want" : "Default size for this product"}</span>
+            </div>
+            <div className="product-choice-grid">
+              {sizeOptions.map((size) => (
+                <label key={size} className={`product-choice-card ${selectedSize === size ? "active" : ""}`}>
+                  <input
+                    type="radio"
+                    name="selectedSize"
+                    value={size}
+                    checked={selectedSize === size}
+                    onChange={(event) => setSelectedSize(event.target.value)}
+                  />
+                  <span className="product-choice-label">{size.toUpperCase()}</span>
+                  <small className="product-choice-meta">{getSizeOptionMeta(size)}</small>
+                </label>
+              ))}
+            </div>
+          </section>
+
+          <section className="product-detail-card">
+            <div className="product-spec-header">
+              <p className="product-detail-eyebrow">Accessories</p>
+              <span>Choose your package option before adding to cart</span>
+            </div>
+            <div className="product-choice-grid">
+              <label className={`product-choice-card ${accessoriesOption === "with" ? "active" : ""}`}>
+                <input
+                  type="radio"
+                  name="accessoriesOption"
+                  value="with"
+                  checked={accessoriesOption === "with"}
+                  onChange={(event) => setAccessoriesOption(event.target.value)}
+                />
+                <span className="product-choice-label">With ACCESSORIES</span>
+                <small className="product-choice-meta">{getAccessoriesOptionMeta("with")}</small>
+              </label>
+              <label className={`product-choice-card ${accessoriesOption === "without" ? "active" : ""}`}>
+                <input
+                  type="radio"
+                  name="accessoriesOption"
+                  value="without"
+                  checked={accessoriesOption === "without"}
+                  onChange={(event) => setAccessoriesOption(event.target.value)}
+                />
+                <span className="product-choice-label">Without ACCESSORIES</span>
+                <small className="product-choice-meta">{getAccessoriesOptionMeta("without")}</small>
+              </label>
+            </div>
+          </section>
+
+          <div className="product-actions detail-actions">
+            <button onClick={() => addToCart(product, accessoriesOption, selectedSize)}>Add to Cart</button>
             <button onClick={() => toggleWishlist(product)}>
               {isWishlisted ? "Remove Wishlist" : "Add Wishlist"}
             </button>
           </div>
         </div>
       </main>
+
+      {isPreviewOpen && activeMedia?.type === "image" ? (
+        <div
+          className="product-preview-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Product image preview"
+          onClick={() => setIsPreviewOpen(false)}
+        >
+          <button
+            type="button"
+            className="product-preview-close"
+            aria-label="Close preview"
+            onClick={() => setIsPreviewOpen(false)}
+          >
+            ×
+          </button>
+          <div
+            className="product-preview-frame"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <img
+              src={activeMedia.src}
+              alt={activeMedia.alt}
+              className="product-preview-image"
+            />
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

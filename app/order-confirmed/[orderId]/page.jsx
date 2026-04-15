@@ -70,6 +70,10 @@ export default function OrderConfirmedPage() {
                     <small>
                       Qty {item.quantity} x Rs. {item.price}
                     </small>
+                    <small>Size: {(item.selectedSize || "FREESIZE").toUpperCase()}</small>
+                    <small>
+                      {item.accessoriesOption === "with" ? "With ACCESSORIES" : "Without ACCESSORIES"}
+                    </small>
                   </div>
                   <strong>Rs. {item.quantity * item.price}</strong>
                 </div>

@@ -23,6 +23,16 @@ const UserSchema = new mongoose.Schema(
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
         quantity: { type: Number, default: 1, min: 1 },
+        accessoriesOption: {
+          type: String,
+          enum: ["with", "without"],
+          default: "without",
+        },
+        selectedSize: {
+          type: String,
+          default: "FREESIZE",
+          trim: true,
+        },
       },
     ],
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],

@@ -16,6 +16,8 @@ function normalizeItem(item = {}) {
     image: item.image || item.images?.[0]?.url || "",
     price: Number(item.price || 0),
     quantity: Number(item.quantity || 0),
+    accessoriesOption: item.accessoriesOption === "with" ? "with" : "without",
+    selectedSize: item.selectedSize?.trim() || "FREESIZE",
   };
 }
 

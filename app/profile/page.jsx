@@ -87,6 +87,12 @@ export default function ProfilePage() {
                           <p className="cart-copy">
                             Qty {item.quantity} x Rs. {item.price}
                           </p>
+                          <p className="cart-copy">
+                            Size: {(item.selectedSize || "FREESIZE").toUpperCase()}
+                          </p>
+                          <p className="cart-copy">
+                            {item.accessoriesOption === "with" ? "With ACCESSORIES" : "Without ACCESSORIES"}
+                          </p>
                         </div>
                       </div>
                     ))}

@@ -12,6 +12,8 @@ const ProductSchema = new mongoose.Schema(
     isCertifiedImperfect: { type: Boolean, default: false },
     thumbnail: { type: String },
     images: [{ url: String, alt: String }],
+    video: { type: String },
+    sizes: [{ type: String, trim: true }],
     category: {
       gender: { type: String, enum: ["men", "women", "unisex"] },
       strap: { type: String, enum: ["leather", "steel", "silicone", "nylon"] },

@@ -65,12 +65,12 @@ export default function FilterSidebar({
   return (
     <aside className="filter-sidebar">
       <div className="filter-card">
-        <p className="filter-label">Browse By Category</p>
-        <h2>Collections</h2>
-        <p className="filter-copy">
+        {/* <p className="filter-label">Browse By Category</p> */}
+        {/* <h2>Collections</h2> */}
+        {/* <p className="filter-copy">
           Switch between product types as your catalog grows across watches, shoes, handbags,
           sunglasses, and more.
-        </p>
+        </p> */}
 
         <form className="filter-search-form" onSubmit={handleSearchSubmit}>
           <label htmlFor="product-search" className="filter-select-label">

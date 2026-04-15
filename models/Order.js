@@ -11,6 +11,16 @@ const OrderSchema = new mongoose.Schema(
         image: String,
         price: Number,
         quantity: Number,
+        accessoriesOption: {
+          type: String,
+          enum: ["with", "without"],
+          default: "without",
+        },
+        selectedSize: {
+          type: String,
+          default: "FREESIZE",
+          trim: true,
+        },
       },
     ],
     shippingAddress: {

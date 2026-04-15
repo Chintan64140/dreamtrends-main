@@ -105,6 +105,8 @@ export default function CheckoutPage() {
           image: getCheckoutImage(item),
           price: item.price,
           quantity: item.quantity,
+          selectedSize: item.selectedSize,
+          accessoriesOption: item.accessoriesOption,
         })),
         shippingAddress: {
           name: address.name.trim(),

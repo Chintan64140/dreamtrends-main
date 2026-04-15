@@ -9,12 +9,29 @@ function formatCategoryLabel(category) {
     .join(" ");
 }
 
+function buildCategoryLabel(category, index) {
+  const label = formatCategoryLabel(category);
+  const presets = [
+    "G-SHOCK+",
+    "Wallet+Belt",
+    "Mens Watch",
+    "Sunglasses and Frames",
+    "Ladies Watch",
+    "Home Decor",
+    "G-Shock In SALE",
+  ];
+
+  return presets[index] || label;
+}
+
 export default function CategoryBoard({ categories = [] }) {
+  console.log(categories);
+
   const visibleCategories = categories.slice(0, 5).map((category, index) => ({
     id: category._id || category.slug || index,
-    label: formatCategoryLabel(category),
+    label: category.name,
     href: `/products?category=${category.slug || ""}`,
-    featured: index % 4 === 3
+    featured: index % 4 === 3,
   }));
 
   return (
@@ -27,12 +44,12 @@ export default function CategoryBoard({ categories = [] }) {
               href={category.href}
               className={`category-tile ${category.featured ? "featured" : ""}`}
             >
-              <span>{category.label}</span>
+              <span className="category-tile-label">{category.label}</span>
             </Link>
           ))}
 
           <Link href="/products" className="category-tile category-tile-all">
-            <span>All Categories</span>
+            <span className="category-tile-label">All Categories</span>
           </Link>
         </div>
       </div>

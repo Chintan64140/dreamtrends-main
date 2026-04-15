@@ -40,18 +40,22 @@ export default function CartPage() {
           <div className="cart-layout">
             <section className="list-grid">
               {cart.map((item) => (
-                <article key={item._id} className="list-card">
+                <article key={item.cartItemId || item._id} className="list-card">
                   <img src={toAbsoluteMediaUrl(item.image)} alt={item.name} className="list-image" />
                   <div>
                     <p className="product-name">{item.name}</p>
                     <p className="product-price">Rs. {item.price}</p>
+                    <p className="cart-copy">Size: {(item.selectedSize || "FREESIZE").toUpperCase()}</p>
+                    <p className="cart-copy">
+                      {item.accessoriesOption === "with" ? "With ACCESSORIES" : "Without ACCESSORIES"}
+                    </p>
                     <div className="cart-line">
-                      <button onClick={() => updateCartQty(item._id, item.quantity - 1)}>-</button>
+                      <button onClick={() => updateCartQty(item.cartItemId, item.quantity - 1)}>-</button>
                       <span>{item.quantity}</span>
-                      <button onClick={() => updateCartQty(item._id, item.quantity + 1)}>+</button>
+                      <button onClick={() => updateCartQty(item.cartItemId, item.quantity + 1)}>+</button>
                     </div>
                     <div className="product-actions">
-                      <button onClick={() => removeFromCart(item._id)}>Remove</button>
+                      <button onClick={() => removeFromCart(item.cartItemId)}>Remove</button>
                     </div>
                   </div>
                 </article>
