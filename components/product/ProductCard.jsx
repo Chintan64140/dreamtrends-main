@@ -22,7 +22,7 @@ export default function ProductCard({ product }) {
         />
       </Link>
       <div className="product-body">
-        <p className="product-brand">{product.brand}</p>
+        {/* <p className="product-brand">{product.brand}</p> */}
         <Link href={`/products/${product.slug}`} className="product-name">
           {product.name}
         </Link>

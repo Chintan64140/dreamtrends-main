@@ -5,7 +5,7 @@ const ProductSchema = new mongoose.Schema(
     name: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     sku: { type: String, required: true, unique: true },
-    brand: { type: String, default: "Sylvi" },
+    brand: { type: String, default: "" },
     description: { type: String },
     price: { type: Number, required: true },
     comparePrice: { type: Number },
