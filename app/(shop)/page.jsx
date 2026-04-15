@@ -68,7 +68,7 @@ export default async function HomePage() {
           </div>
           <ProductGrid products={featuredProducts} className="product-grid-home" />
         </section>
-        <section className="page-shell collection-banner">
+        {/* <section className="page-shell collection-banner">
           <div className="collection-copy">
             <p className="section-kicker">Collections</p>
             <h2>Designed to feel like a campaign page, not a plain catalog.</h2>
@@ -83,7 +83,7 @@ export default async function HomePage() {
               </article>
             ))}
           </div>
-        </section>
+        </section> */}
         <section className="page-shell home-section">
           <div className="home-section-head">
             <div>
