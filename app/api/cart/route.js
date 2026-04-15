@@ -15,6 +15,18 @@ function normalizeSelectedSize(value) {
   return String(value || "FREESIZE").trim() || "FREESIZE";
 }
 
+function getEffectiveProductPrice(product, accessoriesOption) {
+  if (
+    normalizeAccessoriesOption(accessoriesOption) === "with" &&
+    product?.hasAccessories &&
+    Number(product?.accessoriesPrice || 0) > 0
+  ) {
+    return Number(product.accessoriesPrice);
+  }
+
+  return Number(product?.price || 0);
+}
+
 async function getCartResponse(userId) {
   const user = await User.findById(userId)
     .populate({
@@ -26,13 +38,20 @@ async function getCartResponse(userId) {
   const cart =
     user?.cart
       ?.filter((item) => item.product)
-      .map((item) => ({
-        ...serializeProduct(item.product),
-        cartItemId: item._id?.toString?.() || item._id,
-        quantity: item.quantity,
-        accessoriesOption: normalizeAccessoriesOption(item.accessoriesOption),
-        selectedSize: normalizeSelectedSize(item.selectedSize),
-      })) || [];
+      .map((item) => {
+        const accessoriesOption = normalizeAccessoriesOption(item.accessoriesOption);
+        const product = serializeProduct(item.product);
+
+        return {
+          ...product,
+          price: getEffectiveProductPrice(item.product, accessoriesOption),
+          basePrice: Number(item.product?.price || product.price || 0),
+          cartItemId: item._id?.toString?.() || item._id,
+          quantity: item.quantity,
+          accessoriesOption,
+          selectedSize: normalizeSelectedSize(item.selectedSize),
+        };
+      }) || [];
 
   return cart;
 }
@@ -61,13 +80,16 @@ export async function POST(request) {
     }
 
     await connectDB();
-    const product = await Product.findById(productId).select("_id");
+    const product = await Product.findById(productId).select("_id hasAccessories accessoriesPrice");
     if (!product) {
       return NextResponse.json({ error: "Product not found." }, { status: 404 });
     }
 
     const user = await User.findById(authUser.id);
-    const normalizedAccessoriesOption = normalizeAccessoriesOption(accessoriesOption);
+    const normalizedAccessoriesOption =
+      product.hasAccessories && Number(product.accessoriesPrice || 0) > 0
+        ? normalizeAccessoriesOption(accessoriesOption)
+        : "without";
     const normalizedSelectedSize = normalizeSelectedSize(selectedSize);
     const existingItem = user.cart.find(
       (item) =>

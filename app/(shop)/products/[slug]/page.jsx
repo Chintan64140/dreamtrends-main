@@ -30,6 +30,14 @@ function getAccessoriesOptionMeta(option) {
   return option === "with" ? "Included" : "Not included";
 }
 
+function getProductPrice(product, option) {
+  if (option === "with" && product?.hasAccessories && Number(product?.accessoriesPrice || 0) > 0) {
+    return Number(product.accessoriesPrice);
+  }
+
+  return Number(product?.price || 0);
+}
+
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const { addToCart, toggleWishlist, wishlist } = useShop();
@@ -83,6 +91,8 @@ export default function ProductDetailPage() {
   }, [product]);
 
   const activeMedia = mediaItems[activeMediaIndex] || mediaItems[0] || null;
+  const hasAccessoriesOption = Boolean(product?.hasAccessories && Number(product?.accessoriesPrice || 0) > 0);
+  const selectedPrice = getProductPrice(product, accessoriesOption);
   const sizeOptions = useMemo(() => {
     const configuredSizes = Array.isArray(product?.sizes)
       ? product.sizes
@@ -134,6 +144,12 @@ export default function ProductDetailPage() {
       setSelectedSize(sizeOptions[0] || "FREESIZE");
     }
   }, [selectedSize, sizeOptions]);
+
+  useEffect(() => {
+    if (!hasAccessoriesOption && accessoriesOption !== "without") {
+      setAccessoriesOption("without");
+    }
+  }, [accessoriesOption, hasAccessoriesOption]);
 
   if (loading) {
     return (
@@ -260,7 +276,7 @@ export default function ProductDetailPage() {
             <p className="product-brand">{product.brand || "dreamtrends"}</p>
             <h1 className="product-detail-title">{product.name}</h1>
             <p className="product-price product-detail-price">
-              Rs. {product.price} {product.comparePrice > product.price && <span>Rs. {product.comparePrice}</span>}
+              Rs. {selectedPrice} {product.comparePrice > selectedPrice && <span>Rs. {product.comparePrice}</span>}
             </p>
             <p className="product-detail-intro">
               Crafted for everyday wear with a sharper, more premium presentation across dial finish, strap texture, and wrist presence.
@@ -330,7 +346,8 @@ export default function ProductDetailPage() {
             </div>
           </section>
 
-          <section className="product-detail-card">
+          {hasAccessoriesOption ? (
+            <section className="product-detail-card">
             <div className="product-spec-header">
               <p className="product-detail-eyebrow">Accessories</p>
               <span>Choose your package option before adding to cart</span>
@@ -345,7 +362,9 @@ export default function ProductDetailPage() {
                   onChange={(event) => setAccessoriesOption(event.target.value)}
                 />
                 <span className="product-choice-label">With ACCESSORIES</span>
-                <small className="product-choice-meta">{getAccessoriesOptionMeta("with")}</small>
+                <small className="product-choice-meta">
+                  {getAccessoriesOptionMeta("with")} - Rs. {product.accessoriesPrice}
+                </small>
               </label>
               <label className={`product-choice-card ${accessoriesOption === "without" ? "active" : ""}`}>
                 <input
@@ -356,10 +375,13 @@ export default function ProductDetailPage() {
                   onChange={(event) => setAccessoriesOption(event.target.value)}
                 />
                 <span className="product-choice-label">Without ACCESSORIES</span>
-                <small className="product-choice-meta">{getAccessoriesOptionMeta("without")}</small>
+                <small className="product-choice-meta">
+                  {getAccessoriesOptionMeta("without")} - Rs. {product.price}
+                </small>
               </label>
             </div>
           </section>
+          ) : null}
 
           <div className="product-actions detail-actions">
             <button onClick={() => addToCart(product, accessoriesOption, selectedSize)}>Add to Cart</button>

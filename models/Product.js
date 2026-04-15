@@ -9,6 +9,8 @@ const ProductSchema = new mongoose.Schema(
     description: { type: String },
     price: { type: Number, required: true },
     comparePrice: { type: Number },
+    hasAccessories: { type: Boolean, default: false },
+    accessoriesPrice: { type: Number, default: 0, min: 0 },
     isCertifiedImperfect: { type: Boolean, default: false },
     thumbnail: { type: String },
     images: [{ url: String, alt: String }],
@@ -38,5 +40,11 @@ const ProductSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+const existingProductModel = mongoose.models.Product;
+
+if (existingProductModel && !existingProductModel.schema.path("hasAccessories")) {
+  delete mongoose.models.Product;
+}
 
 export default mongoose.models.Product || mongoose.model("Product", ProductSchema);
