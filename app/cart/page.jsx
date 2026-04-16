@@ -7,9 +7,8 @@ import { toAbsoluteMediaUrl } from "@/lib/shopState";
 
 export default function CartPage() {
   const { cart, cartCount, cartTotal, removeFromCart, updateCartQty, user } = useShop();
-  const discount = Math.round(cartTotal * 0.1);
   const shipping = cart.length ? 0 : 0;
-  const total = Math.max(cartTotal - discount + shipping, 0);
+  const total = Math.max(cartTotal + shipping, 0);
 
   return (
     <>
@@ -75,10 +74,6 @@ export default function CartPage() {
                 <div>
                   <span>Subtotal</span>
                   <strong>Rs. {cartTotal}</strong>
-                </div>
-                <div>
-                  <span>Discount</span>
-                  <strong>- Rs. {discount}</strong>
                 </div>
                 <div>
                   <span>Shipping</span>

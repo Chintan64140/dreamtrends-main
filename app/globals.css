@@ -924,10 +924,16 @@ body {
 
 .product-name {
   margin-top: 8px;
-  display: block;
+  display: -webkit-box;
   font-weight: 700;
   line-height: 1.4;
-  min-height: 44px;
+  min-height: calc(1.4em * 2);
+  max-height: calc(1.4em * 2);
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  text-overflow: ellipsis;
 }
 
 .product-price {
@@ -2624,7 +2630,8 @@ h3,
 }
 
 .product-name {
-  min-height: 0;
+  min-height: calc(1.4em * 2);
+  max-height: calc(1.4em * 2);
   font-size: 15px;
 }
 
@@ -2802,6 +2809,8 @@ h3,
     margin-top: 6px;
     font-size: 14px;
     line-height: 1.35;
+    min-height: calc(1.35em * 2);
+    max-height: calc(1.35em * 2);
   }
 
   .product-price {

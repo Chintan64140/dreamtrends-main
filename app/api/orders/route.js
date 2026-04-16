@@ -23,9 +23,9 @@ function normalizeItem(item = {}) {
 
 function buildPricing(items = []) {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const discount = Math.round(subtotal * 0.1);
+  const discount = 0;
   const shipping = subtotal > 0 ? 0 : 0;
-  const total = Math.max(subtotal - discount + shipping, 0);
+  const total = Math.max(subtotal + shipping, 0);
 
   return { subtotal, discount, shipping, total };
 }

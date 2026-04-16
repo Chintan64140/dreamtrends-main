@@ -47,26 +47,13 @@ export default function OrderSummary({
           />
           <span>Cash on delivery</span>
         </label>
-        <label className={`payment-option ${paymentMethod === "card" ? "active" : ""}`}>
-          <input
-            type="radio"
-            name="paymentMethod"
-            value="card"
-            checked={paymentMethod === "card"}
-            onChange={(event) => onPaymentChange(event.target.value)}
-          />
-          <span>Card payment on delivery handoff</span>
-        </label>
+       
       </div>
 
       <div className="summary-totals">
         <div>
           <span>Subtotal</span>
           <strong>Rs. {pricing.subtotal}</strong>
-        </div>
-        <div>
-          <span>Discount</span>
-          <strong>- Rs. {pricing.discount}</strong>
         </div>
         <div>
           <span>Shipping</span>

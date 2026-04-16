@@ -9,7 +9,6 @@ import CheckoutStepper from "@/components/checkout/Stepper";
 import { useShop } from "@/context/ShopContext";
 
 const SHIPPING_CHARGE = 0;
-const DISCOUNT_RATE = 0.1;
 const CHECKOUT_STEPS = ["Cart", "Address", "Payment", "Confirm"];
 
 const emptyAddress = {
@@ -31,19 +30,23 @@ function getCheckoutImage(item) {
 function validateAddress(address) {
   const nextErrors = {};
 
-  if (!address.name.trim()) nextErrors.name = "Please enter the recipient name.";
-  if (!/^\d{10}$/.test(address.phone.trim())) nextErrors.phone = "Enter a valid 10-digit phone number.";
+  if (!address.name.trim())
+    nextErrors.name = "Please enter the recipient name.";
+  if (!/^\d{10}$/.test(address.phone.trim()))
+    nextErrors.phone = "Enter a valid 10-digit phone number.";
   if (!address.line1.trim()) nextErrors.line1 = "Address line 1 is required.";
   if (!address.city.trim()) nextErrors.city = "City is required.";
   if (!address.state.trim()) nextErrors.state = "State is required.";
-  if (!/^\d{6}$/.test(address.pincode.trim())) nextErrors.pincode = "Enter a valid 6-digit pincode.";
+  if (!/^\d{6}$/.test(address.pincode.trim()))
+    nextErrors.pincode = "Enter a valid 6-digit pincode.";
 
   return nextErrors;
 }
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, cartCount, cartTotal, user, clearCart, authLoading, isReady } = useShop();
+  const { cart, cartCount, cartTotal, user, clearCart, authLoading, isReady } =
+    useShop();
   const [address, setAddress] = useState({
     ...emptyAddress,
     name: user?.name || "",
@@ -64,9 +67,9 @@ export default function CheckoutPage() {
 
   const pricing = useMemo(() => {
     const subtotal = cartTotal;
-    const discount = Math.round(subtotal * DISCOUNT_RATE);
+    const discount = 0;
     const shipping = subtotal > 0 ? SHIPPING_CHARGE : 0;
-    const total = Math.max(subtotal - discount + shipping, 0);
+    const total = Math.max(subtotal + shipping, 0);
 
     return { subtotal, discount, shipping, total };
   }, [cartTotal]);
@@ -90,7 +93,9 @@ export default function CheckoutPage() {
     const nextErrors = validateAddress(address);
     if (Object.keys(nextErrors).length) {
       setErrors(nextErrors);
-      setSubmitError("Please correct the highlighted fields before placing the order.");
+      setSubmitError(
+        "Please correct the highlighted fields before placing the order.",
+      );
       return;
     }
 
@@ -144,6 +149,13 @@ export default function CheckoutPage() {
       if (typeof window !== "undefined") {
         window.sessionStorage.setItem("lastOrderId", data.order.orderId);
       }
+
+      const message = `Hello
+I have placed Order
+Here is OrderId - ${data.order.orderId}`;
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappLink = `https://wa.me/919586006414?text=${encodedMessage}`;
+      window.open(whatsappLink, "_blank");
       router.push(`/order-confirmed/${data.order.orderId}`);
     } catch (error) {
       setSubmitError(error.message);
@@ -160,11 +172,15 @@ export default function CheckoutPage() {
           <p className="checkout-eyebrow">Secure checkout</p>
           <h1>Finish your order in one clean flow.</h1>
           <p>
-            Review your delivery details, confirm payment mode, and place the order from the same screen.
+            Review your delivery details, confirm payment mode, and place the
+            order from the same screen.
           </p>
         </div>
 
-        <CheckoutStepper steps={CHECKOUT_STEPS} currentStep={cart.length ? 3 : 0} />
+        <CheckoutStepper
+          steps={CHECKOUT_STEPS}
+          currentStep={cart.length ? 3 : 0}
+        />
 
         {!isReady || authLoading ? (
           <section className="checkout-card">
@@ -177,7 +193,10 @@ export default function CheckoutPage() {
           <section className="checkout-card">
             <h2>Login required</h2>
             <p>Please login before continuing to checkout.</p>
-            <button className="checkout-submit" onClick={() => router.push("/login?redirect=/checkout")}>
+            <button
+              className="checkout-submit"
+              onClick={() => router.push("/login?redirect=/checkout")}
+            >
               Go to login
             </button>
           </section>
@@ -187,7 +206,10 @@ export default function CheckoutPage() {
           <section className="checkout-card">
             <h2>Your cart is empty</h2>
             <p>Add at least one product to continue with checkout.</p>
-            <button className="checkout-submit" onClick={() => router.push("/products")}>
+            <button
+              className="checkout-submit"
+              onClick={() => router.push("/products")}
+            >
               Browse products
             </button>
           </section>
@@ -196,8 +218,14 @@ export default function CheckoutPage() {
         {isReady && user && cart.length ? (
           <div className="checkout-grid">
             <div className="checkout-main">
-              <AddressForm value={address} errors={errors} onChange={handleFieldChange} />
-              {submitError ? <p className="admin-error checkout-error">{submitError}</p> : null}
+              <AddressForm
+                value={address}
+                errors={errors}
+                onChange={handleFieldChange}
+              />
+              {submitError ? (
+                <p className="admin-error checkout-error">{submitError}</p>
+              ) : null}
             </div>
 
             <OrderSummary
