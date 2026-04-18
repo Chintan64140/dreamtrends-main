@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import HeroBanner from "@/components/home/HeroBanner";
 import CategoryBoard from "@/components/home/CategoryBoard";
@@ -65,6 +66,9 @@ export default async function HomePage() {
                 A tighter, brighter catalog presentation inspired by premium watch storefronts.
               </p>
             </div>
+            <Link href="/products" className="home-section-link">
+              View All Products
+            </Link>
           </div>
           <ProductGrid products={featuredProducts} className="product-grid-home" />
         </section>
@@ -93,6 +97,9 @@ export default async function HomePage() {
                 Same routes and shopping logic, but surfaced in a denser landing-page layout.
               </p>
             </div>
+            <Link href="/products" className="home-section-link">
+              View All Products
+            </Link>
           </div>
           <ProductGrid products={newArrivalProducts} className="product-grid-home" />
         </section>
