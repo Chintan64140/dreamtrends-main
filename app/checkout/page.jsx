@@ -145,6 +145,15 @@ export default function CheckoutPage() {
         throw new Error(data.error || "Unable to place order.");
       }
 
+      if (typeof window !== "undefined" && window.fbq) {
+        window.fbq("track", "PlaceOrder", {
+          content_ids: cart.map((item) => item._id || item.id).filter(Boolean),
+          content_type: "product",
+          value: pricing.total,
+          currency: "INR",
+        });
+      }
+
       await clearCart();
       if (typeof window !== "undefined") {
         window.sessionStorage.setItem("lastOrderId", data.order.orderId);
